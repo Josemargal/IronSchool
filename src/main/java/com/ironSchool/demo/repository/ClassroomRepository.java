@@ -1,4 +1,7 @@
 package com.ironSchool.demo.repository;
 
-public class ClassroomRepository {
+import com.ironSchool.demo.model.Classroom;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
 }
