@@ -1,6 +1,8 @@
 package com.ironSchool.demo.controller;
 
 
+import com.ironSchool.demo.model.AuthRequest;
+import com.ironSchool.demo.model.AuthResponse;
 import com.ironSchool.demo.repository.TeacherRepository;
 import com.ironSchool.demo.security.JwtUtil;
 import org.springframework.http.ResponseEntity;
