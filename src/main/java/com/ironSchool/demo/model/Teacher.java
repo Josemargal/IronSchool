@@ -1,20 +1,22 @@
 package com.ironSchool.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Teacher extends UserAdmin {
 
-    private String department;
+    private String email;
 
-    @OneToMany(mappedBy = "teacher")
-    private Set<Subject> subjects;
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subject> subjects;
 }
+
+

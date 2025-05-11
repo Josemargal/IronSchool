@@ -30,7 +30,7 @@ public class SubjectService {
     public Subject update(Long id, Subject updatedSubject) {
         Subject subject = findById(id);
         subject.setName(updatedSubject.getName());
-        subject.setSchedule(updatedSubject.getSchedule());
+       /* subject.setSchedule(updatedSubject.getSchedule());*/
         subject.setClassroom(updatedSubject.getClassroom());
         subject.setTeacher(updatedSubject.getTeacher());
         subject.setStudents(updatedSubject.getStudents());
