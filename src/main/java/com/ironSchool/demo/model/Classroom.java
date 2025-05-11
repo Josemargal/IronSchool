@@ -3,7 +3,7 @@ package com.ironSchool.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,9 +16,9 @@ public class Classroom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String roomNumber;
-    private int capacity;
+    private String name;
 
-    @OneToMany(mappedBy = "classroom")
-    private Set<Subject> subjects;
+    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subject> subjects;
 }
+

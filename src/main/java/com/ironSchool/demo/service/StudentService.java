@@ -29,7 +29,7 @@ public class StudentService {
 
     public Student update(Long id, Student updatedStudent) {
         Student student = findById(id);
-        student.setName(updatedStudent.getName());
+        student.setFullName(updatedStudent.getFullName());
         student.setEmail(updatedStudent.getEmail());
         student.setPassword(updatedStudent.getPassword());
         student.setRole(updatedStudent.getRole());

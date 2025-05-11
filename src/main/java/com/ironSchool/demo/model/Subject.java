@@ -3,7 +3,7 @@ package com.ironSchool.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,7 +17,6 @@ public class Subject {
     private Long id;
 
     private String name;
-    private String schedule;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
@@ -29,9 +28,10 @@ public class Subject {
             joinColumns = @JoinColumn(name = "subject_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
-    private Set<Student> students;
+    private List<Student> students;
 
     @ManyToOne
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
 }
+

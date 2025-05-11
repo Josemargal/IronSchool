@@ -3,17 +3,16 @@ package com.ironSchool.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Set;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class Student extends UserAdmin {
 
-    private int grade;
+    private String email;
 
-    @ManyToMany(mappedBy = "students")
-    private Set<Subject> subjects;
+    private int grade;
 }
+
