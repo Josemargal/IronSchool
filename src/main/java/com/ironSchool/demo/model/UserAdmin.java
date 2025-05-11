@@ -1,20 +1,26 @@
 package com.ironSchool.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.management.relation.Role;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @MappedSuperclass
 public abstract class UserAdmin {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String username;
+    private String password;
     private String name;
     private String email;
-    private String password;
-    private String role;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }
+
