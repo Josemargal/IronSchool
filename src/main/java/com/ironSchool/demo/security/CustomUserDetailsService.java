@@ -16,11 +16,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Teacher teacher = teacherRepository.findByUsername(username)
+        Teacher teacher = teacherRepository.findByFullEmail(username)  // <- CAMBIO AQUÍ
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         return User.builder()
-                .username(teacher.getUsername())
+                .username(teacher.getFullEmail())
                 .password(teacher.getPassword())
                 .roles("TEACHER")
                 .build();

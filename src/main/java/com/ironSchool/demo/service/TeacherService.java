@@ -29,7 +29,7 @@ public class TeacherService {
 
     public Teacher update(Long id, Teacher updatedTeacher) {
         Teacher teacher = findById(id);
-        teacher.setName(updatedTeacher.getName());
+        teacher.setFullName(updatedTeacher.getFullName());
         teacher.setEmail(updatedTeacher.getEmail());
         teacher.setPassword(updatedTeacher.getPassword());
         teacher.setRole(updatedTeacher.getRole());

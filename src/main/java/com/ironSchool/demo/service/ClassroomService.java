@@ -29,8 +29,7 @@ public class ClassroomService {
 
     public Classroom update(Long id, Classroom updatedClassroom) {
         Classroom classroom = findById(id);
-        classroom.setRoomNumber(updatedClassroom.getRoomNumber());
-        classroom.setCapacity(updatedClassroom.getCapacity());
+        classroom.setName(updatedClassroom.getName());
         return repo.save(classroom);
     }
 

@@ -3,11 +3,11 @@ package com.ironSchool.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@MappedSuperclass
 public abstract class UserAdmin {
 
     @Id
@@ -15,11 +15,12 @@ public abstract class UserAdmin {
     private Long id;
 
     private String fullName;
-
+    private String fullEmail;
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 }
+
 
 
