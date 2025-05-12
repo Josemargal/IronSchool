@@ -2,6 +2,7 @@ package com.ironSchool.demo.service;
 
 import com.ironSchool.demo.model.Subject;
 import com.ironSchool.demo.repository.SubjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,35 +10,32 @@ import java.util.List;
 @Service
 public class SubjectService {
 
-    private final SubjectRepository repo;
+    @Autowired
+    private SubjectRepository subjectRepository;
 
-    public SubjectService(SubjectRepository repo) {
-        this.repo = repo;
+    public List<Subject> getAllSubjects() {
+        return subjectRepository.findAll();
     }
 
-    public List<Subject> findAll() {
-        return repo.findAll();
+    public Subject getSubjectById(Long id) {
+        return subjectRepository.findById(id).orElse(null);
     }
 
-    public Subject findById(Long id) {
-        return repo.findById(id).orElseThrow(() -> new RuntimeException("Subject not found"));
+    public Subject saveSubject(Subject subject) {
+        return subjectRepository.save(subject);
     }
 
-    public Subject save(Subject subject) {
-        return repo.save(subject);
+    public Subject updateSubject(Long id, Subject subjectDetails) {
+        Subject subject = subjectRepository.findById(id).orElse(null);
+        if (subject != null) {
+            subject.setName(subjectDetails.getName());
+            subject.setSchedule(subjectDetails.getSchedule());
+            return subjectRepository.save(subject);
+        }
+        return null;
     }
 
-    public Subject update(Long id, Subject updatedSubject) {
-        Subject subject = findById(id);
-        subject.setName(updatedSubject.getName());
-       /* subject.setSchedule(updatedSubject.getSchedule());*/
-        subject.setClassroom(updatedSubject.getClassroom());
-        subject.setTeacher(updatedSubject.getTeacher());
-        subject.setStudents(updatedSubject.getStudents());
-        return repo.save(subject);
-    }
-
-    public void delete(Long id) {
-        repo.deleteById(id);
+    public void deleteSubject(Long id) {
+        subjectRepository.deleteById(id);
     }
 }

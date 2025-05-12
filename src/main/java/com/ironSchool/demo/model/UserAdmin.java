@@ -1,26 +1,24 @@
 package com.ironSchool.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "user_type")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@MappedSuperclass
 public abstract class UserAdmin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fullName;
-    private String fullEmail;
+    private String name;
+    private String email;
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(name = "user_type", insertable = false, updatable = false)
+    private String userType;
 }
-
-
-

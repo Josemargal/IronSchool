@@ -1,15 +1,14 @@
 package com.ironSchool.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Subject {
 
     @Id
@@ -17,6 +16,7 @@ public class Subject {
     private Long id;
 
     private String name;
+    private String schedule;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
@@ -30,8 +30,7 @@ public class Subject {
     )
     private List<Student> students;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
 }
-
