@@ -2,41 +2,54 @@ package com.ironSchool.demo.service;
 
 import com.ironSchool.demo.model.Subject;
 import com.ironSchool.demo.repository.SubjectRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@SpringBootTest
 public class SubjectServiceTest {
+
+    @Autowired
+    private SubjectService subjectService;
 
     @Mock
     private SubjectRepository subjectRepository;
 
-    @InjectMocks
-    private SubjectService subjectService;
+    @Test
+    public void testGetAllSubjects_returnsEmptyList_whenNoneExist() {
+        when(subjectRepository.findAll()).thenReturn(Collections.emptyList());
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        List<Subject> subjects = subjectService.getAllSubjects();
+        assertTrue(subjects.isEmpty());
     }
 
     @Test
-    public void testGetAllSubjects() {
-        List<Subject> subjects = new ArrayList<>();
-        subjects.add(new Subject());
-        subjects.add(new Subject());
+    public void testGetSubjectById_returnsSubject_whenExists() {
+        Subject subject = new Subject();
+        subject.setId(1L);
+        when(subjectRepository.findById(1L)).thenReturn(Optional.of(subject));
 
-        Mockito.when(subjectRepository.findAll()).thenReturn(subjects);
+        Subject result = subjectService.getSubjectById(1L);
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+    }
 
-        List<Subject> result = subjectService.getAllSubjects();
+    @Test
+    public void testSaveSubject_persistsToDatabase() {
+        Subject subject = new Subject();
+        subject.setName("Física");
 
-        assertEquals(2, result.size());
+        when(subjectRepository.save(any(Subject.class))).thenReturn(subject);
+
+        Subject saved = subjectService.saveSubject(subject);
+        assertNotNull(saved.getName());
     }
 }
