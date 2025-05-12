@@ -1,18 +1,15 @@
 package com.ironSchool.demo.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@DiscriminatorValue("STUDENT")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class Student extends UserAdmin {
-
-    private String email;
 
     private int grade;
 }
-

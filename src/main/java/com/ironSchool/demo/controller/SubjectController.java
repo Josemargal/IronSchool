@@ -2,6 +2,7 @@ package com.ironSchool.demo.controller;
 
 import com.ironSchool.demo.model.Subject;
 import com.ironSchool.demo.service.SubjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,34 +11,31 @@ import java.util.List;
 @RequestMapping("/api/subjects")
 public class SubjectController {
 
-    private final SubjectService service;
-
-    public SubjectController(SubjectService service) {
-        this.service = service;
-    }
+    @Autowired
+    private SubjectService subjectService;
 
     @GetMapping
-    public List<Subject> getAll() {
-        return service.findAll();
+    public List<Subject> getAllSubjects() {
+        return subjectService.getAllSubjects();
     }
 
     @GetMapping("/{id}")
-    public Subject getById(@PathVariable Long id) {
-        return service.findById(id);
+    public Subject getSubjectById(@PathVariable Long id) {
+        return subjectService.getSubjectById(id);
     }
 
     @PostMapping
-    public Subject create(@RequestBody Subject subject) {
-        return service.save(subject);
+    public Subject createSubject(@RequestBody Subject subject) {
+        return subjectService.saveSubject(subject);
     }
 
     @PutMapping("/{id}")
-    public Subject update(@PathVariable Long id, @RequestBody Subject subject) {
-        return service.update(id, subject);
+    public Subject updateSubject(@PathVariable Long id, @RequestBody Subject subjectDetails) {
+        return subjectService.updateSubject(id, subjectDetails);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    public void deleteSubject(@PathVariable Long id) {
+        subjectService.deleteSubject(id);
     }
 }
