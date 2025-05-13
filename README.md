@@ -44,9 +44,8 @@ IronSchool es una API REST construida con Spring Boot para la gestión de un sis
 - `/api/auth` → Registro y login con JWT
 
 ## Enlaces adicionales
-- [Trello](https://trello.com/b/tu-enlace)
+- [Trello](https://trello.com/b/zmnIGeon/ironschool)
 - [Presentación](https://tu-enlace-slides.com)
-- [Documentación UML](https://github.com/Josemargal/IronSchool/tree/main/docs)
 
 ## Trabajo futuro
 - Añadir tests unitarios
@@ -59,5 +58,6 @@ IronSchool es una API REST construida con Spring Boot para la gestión de un sis
 - [Spring Security](https://spring.io/guides/topicals/spring-security-architecture)
 - [JPA/Hibernate](https://hibernate.org/orm/documentation/)
 
-## Miembros del equipo
+## Autor del proyecto
 - [Jose Angel Martin](https://github.com/Josemargal)
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://www.linkedin.com/in/jamaga/)
