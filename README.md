@@ -18,7 +18,7 @@
 IronSchool es una API REST construida con Spring Boot para la gestión de un sistema escolar. Permite administrar usuarios (estudiantes, profesores, administradores), asignaturas y aulas, aplicando herencia con JPA y autenticación segura.
 
 ## Diagrama de clases
-![Diagrama UML](https://github.com/Josemargal/IronSchool/blob/main/docs/diagrama_clases.png)
+![Diagrama UML](img.png)
 
 ## Configuración
 1. Clonar el repositorio:  
