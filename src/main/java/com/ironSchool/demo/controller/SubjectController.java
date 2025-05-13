@@ -3,6 +3,7 @@ package com.ironSchool.demo.controller;
 import com.ironSchool.demo.model.Subject;
 import com.ironSchool.demo.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class SubjectController {
     }
 
     @GetMapping("/{id}")
-    public Subject getSubjectById(@PathVariable Long id) {
-        return subjectService.getSubjectById(id);
+    public ResponseEntity<Subject> getSubjectById(@PathVariable Long id) {
+        return ResponseEntity.of(subjectService.getSubjectById(id));
     }
 
     @PostMapping

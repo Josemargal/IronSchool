@@ -1,43 +1,62 @@
 package com.ironSchool.demo.service;
 
 import com.ironSchool.demo.model.Student;
+import com.ironSchool.demo.model.UserAdmin;
 import com.ironSchool.demo.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class CustomUserDetailsServiceTest {
-
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
 
     @Mock
     private UserRepository userRepository;
 
+    @InjectMocks
+    private CustomUserDetailsService userDetailsService;
+
     @Test
-    public void testLoadUserByUsername_returnsUser() {
+    public void testLoadUserByUsername_Success() {
+        // Preparar datos de prueba
+        String email = "test@example.com";
+
         Student student = new Student();
-        student.setEmail("ana@example.com");
+        student.setId(1L);
+        student.setEmail(email);
+        student.setPassword("encoded_password");
 
-        when(userRepository.findByEmail("ana@example.com")).thenReturn(student);
+        when(userRepository.findByEmail(email)).thenReturn(student);
 
-        var userDetails = userDetailsService.loadUserByUsername("ana@example.com");
+        // Ejecutar
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+        // Verificar
         assertNotNull(userDetails);
-        assertEquals("ana@example.com", userDetails.getUsername());
+        assertEquals(email, userDetails.getUsername());
+        assertEquals("encoded_password", userDetails.getPassword());
+        assertTrue(userDetails.getAuthorities().isEmpty());
     }
 
     @Test
-    public void testLoadUserByUsername_throwsException_whenNotFound() {
-        when(userRepository.findByEmail("notfound@example.com")).thenReturn(null);
+    public void testLoadUserByUsername_UserNotFound() {
+        // Preparar datos de prueba
+        String email = "nonexistent@example.com";
 
-        assertThrows(UsernameNotFoundException.class, () -> {
-            userDetailsService.loadUserByUsername("notfound@example.com");
+        when(userRepository.findByEmail(email)).thenReturn(null);
+
+        // Ejecutar y verificar
+        Exception exception = assertThrows(UsernameNotFoundException.class, () -> {
+            userDetailsService.loadUserByUsername(email);
         });
+
+        assertEquals("Usuario no encontrado", exception.getMessage());
     }
 }

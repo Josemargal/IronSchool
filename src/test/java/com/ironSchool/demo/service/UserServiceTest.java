@@ -1,47 +1,100 @@
 package com.ironSchool.demo.service;
 
 import com.ironSchool.demo.model.Student;
+import com.ironSchool.demo.model.UserAdmin;
 import com.ironSchool.demo.repository.UserRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import java.util.Optional;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-
-    @Autowired
-    private UserService userService;
 
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private UserService userService;
+
     @Test
-    public void testFindByEmail_returnsStudent() {
+    public void testSaveUser() {
+        // Preparar datos de prueba
         Student student = new Student();
-        student.setEmail("student@example.com");
+        student.setName("Test Student");
+        student.setEmail("test@example.com");
+        student.setPassword("password123");
 
-        when(userRepository.findByEmail("student@example.com")).thenReturn(student);
+        when(passwordEncoder.encode("password123")).thenReturn("encoded_password");
 
-        var result = userService.findByEmail("student@example.com");
+        Student savedStudent = new Student();
+        savedStudent.setId(1L);
+        savedStudent.setName("Test Student");
+        savedStudent.setEmail("test@example.com");
+        savedStudent.setPassword("encoded_password");
+
+        when(userRepository.save(any(UserAdmin.class))).thenReturn(savedStudent);
+
+        // Ejecutar
+        UserAdmin result = userService.saveUser(student);
+
+        // Verificar
         assertNotNull(result);
-        assertEquals("student@example.com", result.getEmail());
+        assertEquals(1L, result.getId());
+        assertEquals("test@example.com", result.getEmail());
+        assertEquals("encoded_password", result.getPassword());
+
+        verify(passwordEncoder).encode("password123");
+        verify(userRepository).save(any(UserAdmin.class));
     }
 
     @Test
-    public void testSaveUser_student() {
+    public void testFindByEmail() {
+        // Preparar datos de prueba
+        String email = "test@example.com";
+
         Student student = new Student();
-        student.setEmail("new@example.com");
+        student.setId(1L);
+        student.setEmail(email);
 
-        when(userRepository.save(any(Student.class))).thenReturn(student);
+        when(userRepository.findByEmail(email)).thenReturn(student);
 
-        var result = userService.saveUser(student);
+        // Ejecutar
+        UserAdmin result = userService.findByEmail(email);
+
+        // Verificar
         assertNotNull(result);
-        assertEquals("new@example.com", result.getEmail());
+        assertEquals(1L, result.getId());
+        assertEquals(email, result.getEmail());
+
+        verify(userRepository).findByEmail(email);
+    }
+
+    @Test
+    public void testCheckPassword() {
+        // Preparar datos de prueba
+        UserAdmin user = new Student();
+        user.setPassword("encoded_password");
+
+        String rawPassword = "password123";
+
+        when(passwordEncoder.matches(rawPassword, "encoded_password")).thenReturn(true);
+
+        // Ejecutar
+        boolean result = userService.checkPassword(user, rawPassword);
+
+        // Verificar
+        assertTrue(result);
+
+        verify(passwordEncoder).matches(rawPassword, "encoded_password");
     }
 }
