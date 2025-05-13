@@ -36,7 +36,7 @@ public class JwtUtilTest {
 
         // Verificar
         assertNotNull(token);
-        assertTrue(token.length() > 20); // Un token JWT válido debería ser más largo
+        assertTrue(token.length() > 20);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class JwtUtilTest {
 
         // Verificar
         assertNotNull(expiration);
-        assertTrue(expiration.after(new Date())); // La fecha de expiración debería ser futura
+        assertTrue(expiration.after(new Date()));
     }
 
     @Test

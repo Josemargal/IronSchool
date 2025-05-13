@@ -144,7 +144,6 @@ class AuthControllerTest {
 
         UserDetails userDetails = new User("john@example.com", "password", new ArrayList<>());
 
-        // Crear un mock de Student que responda correctamente a getUserType()
         Student student = mock(Student.class);
         when(student.getUserType()).thenReturn("STUDENT");
 
