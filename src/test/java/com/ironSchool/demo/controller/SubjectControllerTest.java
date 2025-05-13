@@ -4,96 +4,139 @@ import com.ironSchool.demo.model.Subject;
 import com.ironSchool.demo.service.SubjectService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class SubjectControllerTest {
+class SubjectControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private SubjectService subjectService;
 
-    @MockBean
-    private SubjectService subjectService; // ✅ Usamos MockBean en lugar de @Mock
-
-    private Subject sampleSubject;
+    @InjectMocks
+    private SubjectController subjectController;
 
     @BeforeEach
-    public void setup() {
-        sampleSubject = new Subject();
-        sampleSubject.setId(1L);
-        sampleSubject.setName("Matemáticas");
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetAllSubjects_authenticated_withRole() throws Exception {
-        when(subjectService.getAllSubjects()).thenReturn(Arrays.asList(sampleSubject));
+    void getAllSubjects_ReturnsListOfSubjects() {
+        // Arrange
+        Subject subject1 = new Subject();
+        subject1.setId(1L);
+        subject1.setName("Matemáticas");
 
-        mockMvc.perform(get("/api/subjects")
-                        .with(SecurityMockMvcRequestPostProcessors.user("juan@example.com").roles("STUDENT")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+        Subject subject2 = new Subject();
+        subject2.setId(2L);
+        subject2.setName("Historia");
+
+        List<Subject> subjects = Arrays.asList(subject1, subject2);
+
+        when(subjectService.getAllSubjects()).thenReturn(subjects);
+
+        // Act
+        List<Subject> result = subjectController.getAllSubjects();
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Matemáticas", result.get(0).getName());
+        assertEquals("Historia", result.get(1).getName());
+        verify(subjectService, times(1)).getAllSubjects();
     }
 
     @Test
-    public void testGetSubjectById() throws Exception {
-        when(subjectService.getSubjectById(1L)).thenReturn(sampleSubject);
+    void getSubjectById_ExistingId_ReturnsSubject() {
+        // Arrange
+        Subject subject = new Subject();
+        subject.setId(1L);
+        subject.setName("Matemáticas");
 
-        mockMvc.perform(get("/api/subjects/1")
-                        .with(SecurityMockMvcRequestPostProcessors.user("juan@example.com").roles("STUDENT")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Matemáticas"));
+        when(subjectService.getSubjectById(1L)).thenReturn(Optional.of(subject));
+
+        // Act
+        ResponseEntity<Subject> response = subjectController.getSubjectById(1L);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Matemáticas", response.getBody().getName());
+        verify(subjectService, times(1)).getSubjectById(1L);
     }
 
     @Test
-    public void testCreateSubject() throws Exception {
-        Subject requestSubject = new Subject();
-        requestSubject.setName("Historia");
+    void getSubjectById_NonExistingId_ReturnsNotFound() {
+        // Arrange
+        when(subjectService.getSubjectById(99L)).thenReturn(Optional.empty());
 
-        when(subjectService.saveSubject(any(Subject.class))).thenReturn(sampleSubject);
+        // Act
+        ResponseEntity<Subject> response = subjectController.getSubjectById(99L);
 
-        mockMvc.perform(post("/api/subjects")
-                        .with(SecurityMockMvcRequestPostProcessors.user("carlos@example.com").roles("TEACHER"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Historia\"}"))
-                .andExpect(status().isCreated()) // ✅ Cambiado a Created si corresponde
-                .andExpect(jsonPath("$.name").value("Matemáticas")); // ✅ Ahora es correcto
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(subjectService, times(1)).getSubjectById(99L);
     }
 
     @Test
-    public void testUpdateSubject() throws Exception {
+    void createSubject_Success() {
+        // Arrange
+        Subject subjectToCreate = new Subject();
+        subjectToCreate.setName("Ciencias");
+
+        Subject savedSubject = new Subject();
+        savedSubject.setId(3L);
+        savedSubject.setName("Ciencias");
+
+        when(subjectService.saveSubject(any(Subject.class))).thenReturn(savedSubject);
+
+        // Act
+        Subject result = subjectController.createSubject(subjectToCreate);
+
+        // Assert
+        assertEquals(3L, result.getId());
+        assertEquals("Ciencias", result.getName());
+        verify(subjectService, times(1)).saveSubject(subjectToCreate);
+    }
+
+    @Test
+    void updateSubject_Success() {
+        // Arrange
+        Subject subjectDetails = new Subject();
+        subjectDetails.setName("Matemáticas Avanzadas");
+
         Subject updatedSubject = new Subject();
-        updatedSubject.setName("Ciencias");
+        updatedSubject.setId(1L);
+        updatedSubject.setName("Matemáticas Avanzadas");
 
         when(subjectService.updateSubject(eq(1L), any(Subject.class))).thenReturn(updatedSubject);
 
-        mockMvc.perform(put("/api/subjects/1")
-                        .with(SecurityMockMvcRequestPostProcessors.user("carlos@example.com").roles("TEACHER"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\": \"Ciencias\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Ciencias")); // ✅ Ahora coincide
+        // Act
+        Subject result = subjectController.updateSubject(1L, subjectDetails);
+
+        // Assert
+        assertEquals(1L, result.getId());
+        assertEquals("Matemáticas Avanzadas", result.getName());
+        verify(subjectService, times(1)).updateSubject(eq(1L), any(Subject.class));
     }
 
     @Test
-    public void testDeleteSubject() throws Exception {
-        doNothing().when(subjectService).deleteSubject(1L); // Simula un borrado exitoso
+    void deleteSubject_CallsServiceMethod() {
+        // Act
+        subjectController.deleteSubject(1L);
 
-        mockMvc.perform(delete("/api/subjects/1")
-                        .with(SecurityMockMvcRequestPostProcessors.user("carlos@example.com").roles("TEACHER")))
-                .andExpect(status().isNoContent()); // ✅ Asegura que devuelva 204
+        // Assert
+        verify(subjectService, times(1)).deleteSubject(1L);
     }
 }

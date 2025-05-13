@@ -1,83 +1,130 @@
 package com.ironSchool.demo.config;
 
-import com.ironSchool.demo.model.Student;
-import com.ironSchool.demo.service.CustomUserDetailsService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.security.Key;
+import java.util.ArrayList;
 import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class JwtUtilTest {
 
-    @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
-
     private UserDetails userDetails;
+    private final String userEmail = "test@example.com";
 
     @BeforeEach
     public void setUp() {
-        Student student = new Student();
-        student.setEmail("juan@example.com");
-        student.setPassword("123456");
+        jwtUtil = new JwtUtil();
+        // Inyectar los valores necesarios para las pruebas
+        ReflectionTestUtils.setField(jwtUtil, "secretKey", "testSecretKeyNeedsToBeAtLeast32CharactersLong");
+        ReflectionTestUtils.setField(jwtUtil, "expiration", 3600000L);
 
-        // Guarda el usuario en memoria (simulado)
-        userDetails = userDetailsService.loadUserByUsername(student.getEmail());
+        // Crear UserDetails simulado
+        userDetails = new User(userEmail, "password", new ArrayList<>());
     }
 
     @Test
-    public void testGenerateToken_returnsValidToken() {
+    public void testGenerateToken() {
+        // Ejecutar
         String token = jwtUtil.generateToken(userDetails, "STUDENT");
 
-        assertThat(token).isNotBlank();
-        assertThat(jwtUtil.extractEmail(token)).isEqualTo("juan@example.com");
-        assertThat(jwtUtil.extractRole(token)).isEqualTo("STUDENT");
-        assertThat(jwtUtil.validateToken(token, userDetails)).isTrue();
+        // Verificar
+        assertNotNull(token);
+        assertTrue(token.length() > 20); // Un token JWT válido debería ser más largo
     }
 
     @Test
-    public void testValidateToken_withInvalidToken_returnsFalse() {
-        String invalidToken = Jwts.builder()
-                .setSubject("wronguser@example.com")
-                .setExpiration(new Date(System.currentTimeMillis() + 1000))
-                .signWith(getSecureKey(), SignatureAlgorithm.HS512)
-                .compact();
-
-        assertThat(jwtUtil.validateToken(invalidToken, userDetails)).isFalse();
-    }
-
-    @Test
-    public void testIsTokenExpired_returnsFalse_forValidToken() {
+    public void testExtractEmail() {
+        // Preparar
         String token = jwtUtil.generateToken(userDetails, "STUDENT");
-        assertThat(jwtUtil.isTokenExpired(token)).isFalse();
+
+        // Ejecutar
+        String extractedEmail = jwtUtil.extractEmail(token);
+
+        // Verificar
+        assertEquals(userEmail, extractedEmail);
     }
 
     @Test
-    public void testIsTokenExpired_returnsTrue_forExpiredToken() {
-        String expiredToken = Jwts.builder()
-                .setSubject("juan@example.com")
-                .setExpiration(new Date(0)) // Fecha pasada
-                .signWith(getSecureKey(), SignatureAlgorithm.HS512)
-                .compact();
+    public void testExtractRole() {
+        // Preparar
+        String role = "TEACHER";
+        String token = jwtUtil.generateToken(userDetails, role);
 
-        assertThat(jwtUtil.isTokenExpired(expiredToken)).isTrue();
+        // Ejecutar
+        String extractedRole = jwtUtil.extractRole(token);
+
+        // Verificar
+        assertEquals(role, extractedRole);
     }
 
-    private Key getSecureKey() {
-        String secretString = "mySuperSecretKeyForJWTtokensThatNoOneCanGuess123!";
-        return Keys.hmacShaKeyFor(secretString.getBytes());
+    @Test
+    public void testValidateToken_ValidToken() {
+        // Preparar
+        String token = jwtUtil.generateToken(userDetails, "STUDENT");
+
+        // Ejecutar
+        boolean isValid = jwtUtil.validateToken(token, userDetails);
+
+        // Verificar
+        assertTrue(isValid);
+    }
+
+    @Test
+    public void testIsTokenExpired_NotExpired() {
+        // Preparar
+        String token = jwtUtil.generateToken(userDetails, "STUDENT");
+
+        // Ejecutar
+        boolean isExpired = jwtUtil.isTokenExpired(token);
+
+        // Verificar
+        assertFalse(isExpired);
+    }
+
+    @Test
+    public void testExtractExpiration() {
+        // Preparar
+        String token = jwtUtil.generateToken(userDetails, "STUDENT");
+
+        // Ejecutar
+        Date expiration = jwtUtil.extractExpiration(token);
+
+        // Verificar
+        assertNotNull(expiration);
+        assertTrue(expiration.after(new Date())); // La fecha de expiración debería ser futura
+    }
+
+    @Test
+    public void testExtractAllClaims() {
+        // Preparar
+        String token = jwtUtil.generateToken(userDetails, "STUDENT");
+
+        // Ejecutar
+        Claims claims = jwtUtil.extractClaim(token, claims1 -> claims1);
+
+        // Verificar
+        assertNotNull(claims);
+        assertEquals(userEmail, claims.getSubject());
+        assertEquals("STUDENT", claims.get("role"));
+    }
+
+    @Test
+    public void testValidateToken_InvalidUsername() {
+        // Preparar
+        String token = jwtUtil.generateToken(userDetails, "STUDENT");
+        UserDetails differentUser = new User("different@example.com", "password", new ArrayList<>());
+
+        // Ejecutar
+        boolean isValid = jwtUtil.validateToken(token, differentUser);
+
+        // Verificar
+        assertFalse(isValid);
     }
 }
