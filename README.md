@@ -45,7 +45,7 @@ IronSchool es una API REST construida con Spring Boot para la gestión de un sis
 
 ## Enlaces adicionales
 - [Trello](https://trello.com/b/zmnIGeon/ironschool)
-- [Presentación]([https://tu-enlace-slides.com](https://www.canva.com/design/DAGnUrNjmgs/OPzWvHMt_hUq4IYy_vOZfw/view?utm_content=DAGnUrNjmgs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h47650c0149))
+- [Presentación](https://tu-enlace-slides.com](https://www.canva.com/design/DAGnUrNjmgs/OPzWvHMt_hUq4IYy_vOZfw/view?utm_content=DAGnUrNjmgs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h47650c0149)
 
 ## Trabajo futuro
 - Añadir tests unitarios
