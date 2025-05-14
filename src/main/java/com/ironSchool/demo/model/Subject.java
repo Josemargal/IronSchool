@@ -1,5 +1,6 @@
 package com.ironSchool.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,5 +33,6 @@ public class Subject {
 
     @OneToOne
     @JoinColumn(name = "classroom_id")
+    @JsonManagedReference
     private Classroom classroom;
 }
